@@ -1,4 +1,4 @@
-# MasiveDataManager
+# MasiveDataManager (Final Degree Project by Bernardo Soto Raya at ETSIINF UPM)
 
 - On this project we will be working on a way to handle masive ammounts of data while it is moved between data bases and pyhton modules. 
 - The idea is to symulate the BE of an application that handles the reservation and cancels of tickets from a list of sport stadiums.
