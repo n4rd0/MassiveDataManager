@@ -2,15 +2,38 @@
 
 from  Generador import *
 import time
+import threading
+from GeneradorHilos import * 
 
 inicioPrograma = time.time()
 
-asistentes = generarAsistentes(2000)
+numeroDeAsistentes = 10
+numeroDeHilos = 8 
+generarSubida = True
+imprimirPorPantalla = True
+trabajoConHilos = True
 
-for asistente in asistentes: 
-    asistente.imprimirAsistente()
+if trabajoConHilos:
+    t = []
+    
+    for _ in range(numeroDeHilos):
+        th = threading.Thread(target = generarAsistentesHilo, args = (numeroDeAsistentes, generarSubida, imprimirPorPantalla, ))
+        th.start()
+        t.append(th)
+        
+    for thread in t:
+        thread.join()
+    
+    print("\n--- Ejecucion Completada en %.4f s. Asistentes Generados: %i. ---" % (time.time() - inicioPrograma, numeroDeHilos*numeroDeAsistentes))
 
-insertarAsistenteBaseDatos(asistentes)
+else:
+    asistentes = generarAsistentes(numeroDeAsistentes)
+    if imprimirPorPantalla:
+        for asistente in asistentes: 
+            print(asistente)
+    if generarSubida:
+        insertarAsistenteBaseDatos(asistentes)
+    print("\n--- Ejecucion Completada en %.4f s. Asistentes Generados: %i. ---" % (time.time() - inicioPrograma, numeroDeAsistentes))
 
-print("--- Ejecucion Completada en %.4f s. Asistentes Generados: %i. ---" % (time.time() - inicioPrograma, len(asistentes)))
+
 

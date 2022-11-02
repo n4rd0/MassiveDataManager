@@ -17,6 +17,8 @@ cursor = db.cursor()
 
 def generarAsistentes(numeroGeneraciones):
     
+    db = establecerConexion('localhost', 'root', '7821', 'tfg')
+    cursor = db.cursor()
     #Accedemos a distitnas bases de datos de nombres y apellidos para posterior
     #mente generar aleatoriamente los datos
     
@@ -32,19 +34,24 @@ def generarAsistentes(numeroGeneraciones):
     for i in range(numeroGeneraciones):
         
         #Obtenemos todos los estadios almacenados en la bbdd
-        cursor.execute("SELECT * FROM estadio")
+        nEstadios = cursor.execute("SELECT * FROM estadio")
+        
         #Generamos al azar en cual de todos los estadios nuestro asistente 
         #ficticio estara alojandose
-        idEstadio = random.randint(0, cursor.execute("SELECT * FROM estadio")-1)
+        idEstadio = random.randint(0, nEstadios-1)
+        
         #Cogemos un nombre y apellido al azar de las listas proporcionadas
         nombre = listaNombres[random.randint(0,len(listaNombres)-1)]
         apellido = listaApellidos[random.randint(0,len(listaApellidos)-1)]
+        
         #La edad tambien se genera al azar entre 6 y 99
         edad = random.randint(6,99)
+        
         #Para el DNI cogemos un numero al azar y calculamos el modulo para 
         #Asignarle una letra
         DNI = random.randint(0,99999999)
         DNI = str(DNI) + alphabet[DNI%len(alphabet)]
+        
         #La plaza depende del estadio elegido obteniendola igual de forma
         #aleatoria
         cursor.execute("SELECT Secciones FROM tfg.estadio WHERE idEstadadio = '%s'",idEstadio)
@@ -77,18 +84,22 @@ def generarAsistentes(numeroGeneraciones):
         
         asist = Asistente(idEstadio, nombre.strip(), apellido.strip(), edad, DNI.strip(), seccion+grupo+fila+asiento)
         listaAsistentesGenerada.append(asist)
+        
     
     return listaAsistentesGenerada 
 
 #Insertamos los datos de la lista en la BBDD
 def insertarAsistenteBaseDatos(listaAsistentes):
     
+    db = establecerConexion('localhost', 'root', '7821', 'tfg')
+    cursor = db.cursor()
+    
     for asistente in listaAsistentes:
         sql = """INSERT INTO `asistente` (idEstadio, Nombre, 
         Apellido, Edad, DNI, PlazaEstadio) values(%s, %s, %s, %s, %s, %s)"""
         cursor.execute(sql, (asistente.idEstadio, asistente.nombre, asistente.apellido, asistente.edad, asistente.DNI, asistente.plazaEstadio))
         db.commit()
-    return print("--- Todos los asistentes han sido actualizados correctamente ---")
+    return print("\n--- Todos los asistentes han sido actualizados correctamente en la base de datos ---")
 
 #Por el momento vamos a trabajar solo con un estadio (El metropolitano) con 
 #secciones, grupos, filas y asientos cuadrados, es decir, que todas las secciones
