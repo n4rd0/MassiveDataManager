@@ -11,14 +11,72 @@ Asistente(self, idEstadio , nombre, apellido, edad, DNI, plazaEstadio)
 
 """
 
-#conexion a la bbdd 
-db = establecerConexion('localhost', 'root', '7821', 'tfg')
-cursor = db.cursor()
+def modificarPorcentajeLleno(idEstadio):
 
-def generarAsistentes(numeroGeneraciones):
+    db = establecerConexion('localhost', 'root', '7821', 'tfg')
+    cursor = db.cursor()
+
+    #Sacamos el total de asientos ocupados en el estadio
+    asientosOcupados = cursor.execute("SELECT * FROM tfg.asistente WHERE idEstadio = %s", idEstadio)
+    cursor.execute("SELECT Capacidad FROM tfg.estadio WHERE idEstadio = %s", idEstadio)
+
+    #Sacamos la capacidad del estadio
+    capacidad = cursor.fetchall()[0][0]
+
+    #Calculamos el porcentaje
+    porcentajeLLeno = round(asientosOcupados*100/capacidad,4)
+
+    #Ejecutamos la actualizacion del porcentaje en la bbdd
+    cursor.execute("UPDATE tfg.estadio SET PorcentajeLLeno = %s WHERE idEstadio = %s",(porcentajeLLeno, idEstadio))
+    db.commit()
+
+#Eliminar asistentes del estadio por nombre
+def eliminarAsistentes(nombreEstadio, numeroEliminaciones):
     
     db = establecerConexion('localhost', 'root', '7821', 'tfg')
     cursor = db.cursor()
+
+    try:
+
+        asistentesAEliminar = set()
+        #Sacamos la id del estadio asociada al nombre
+        cursor.execute("SELECT idEstadio FROM tfg.estadio WHERE NombreEstadio = %s", nombreEstadio)
+        idEstadio = int(cursor.fetchone()[0])
+
+        #Sacamos loas asistentes que se encuentran en ese estadio
+        cursor.execute("SELECT * FROM tfg.asistente WHERE idEstadio = %s", idEstadio)
+        asistentes = cursor.fetchall()
+
+        #Si hay mas asistentes que los que queremos eliminar, los eliminamos, si no, vaciamos el estadio directamente
+        if len(asistentes) > numeroEliminaciones:
+
+            while(len(asistentesAEliminar) != numeroEliminaciones): asistentesAEliminar.add(random.randint(0, len(asistentes)-1)) 
+            
+            for numeroDeAsistente in asistentesAEliminar:
+                idAsistente = asistentes[numeroDeAsistente][0]
+                cursor.execute("DELETE FROM tfg.asistente WHERE idAsistente = %s", idAsistente)
+                db.commit()
+
+        else:
+            cursor.execute("DELETE FROM tfg.asistente WHERE idEstadio = %s", idEstadio)
+            db.commit()
+            print("No puedes eliminar mas asistentes de los que hay, se han eliminado a todos.")
+        
+        modificarPorcentajeLleno(idEstadio)
+
+    except:
+        print("El nombre introducido para el estadio es incorrecto.")
+
+    return
+
+#Genera el numero indicado de asistentes
+def generarAsistentes(numeroGeneraciones):
+
+    db = establecerConexion('localhost', 'root', '7821', 'tfg')
+    cursor = db.cursor()
+
+    cursor.execute("SELECT idEstadio, PlazaEstadio FROM tfg.asistente")
+    idEstadioAsientos = cursor.fetchall()
     #Accedemos a distitnas bases de datos de nombres y apellidos para posterior
     #mente generar aleatoriamente los datos
     
@@ -54,38 +112,71 @@ def generarAsistentes(numeroGeneraciones):
         
         #La plaza depende del estadio elegido obteniendola igual de forma
         #aleatoria
+
         cursor.execute("SELECT Secciones FROM tfg.estadio WHERE idEstadio = '%s'",idEstadio)
         seccion = random.randint(0, cursor.fetchall()[0][0])
-            
+
         if seccion < 10 :
             seccion = "0" + str(seccion)
         seccion = str(seccion)
-                
+                    
         cursor.execute("SELECT Grupos FROM tfg.estadio WHERE idEstadio = '%s'",idEstadio)
         grupo = random.randint(0, cursor.fetchall()[0][0])
-        
+            
         if grupo < 10 :
             grupo = "0" + str(grupo)
         grupo = str(grupo)
-        
+            
         cursor.execute("SELECT Filas FROM tfg.estadio WHERE idEstadio = '%s'",idEstadio)
         fila = random.randint(0, cursor.fetchall()[0][0])
-        
+            
         if fila < 10 :
             fila = "0" + str(fila)
         fila = str(fila)
-        
+            
         cursor.execute("SELECT Asientos FROM tfg.estadio WHERE idEstadio = '%s'",idEstadio)
         asiento = random.randint(0, cursor.fetchall()[0][0])
-        
+            
         if asiento < 10 :
             asiento = "0" + str(asiento)
         asiento = str(asiento)
-        
+            
         asist = Asistente(idEstadio, nombre.strip(), apellido.strip(), edad, DNI.strip(), seccion+grupo+fila+asiento)
         listaAsistentesGenerada.append(asist)
+
+        if (idEstadio, seccion+grupo+fila+asiento) in idEstadioAsientos:
+            while (idEstadio, seccion+grupo+fila+asiento) in idEstadioAsientos:
+                cursor.execute("SELECT Secciones FROM tfg.estadio WHERE idEstadio = '%s'",idEstadio)
+                seccion = random.randint(0, cursor.fetchall()[0][0])
+
+                if seccion < 10 :
+                    seccion = "0" + str(seccion)
+                seccion = str(seccion)
+                            
+                cursor.execute("SELECT Grupos FROM tfg.estadio WHERE idEstadio = '%s'",idEstadio)
+                grupo = random.randint(0, cursor.fetchall()[0][0])
+                    
+                if grupo < 10 :
+                    grupo = "0" + str(grupo)
+                grupo = str(grupo)
+                    
+                cursor.execute("SELECT Filas FROM tfg.estadio WHERE idEstadio = '%s'",idEstadio)
+                fila = random.randint(0, cursor.fetchall()[0][0])
+                    
+                if fila < 10 :
+                    fila = "0" + str(fila)
+                fila = str(fila)
+                    
+                cursor.execute("SELECT Asientos FROM tfg.estadio WHERE idEstadio = '%s'",idEstadio)
+                asiento = random.randint(0, cursor.fetchall()[0][0])
+                    
+                if asiento < 10 :
+                    asiento = "0" + str(asiento)
+                asiento = str(asiento)
+                    
+                asist = Asistente(idEstadio, nombre.strip(), apellido.strip(), edad, DNI.strip(), seccion+grupo+fila+asiento)
+                listaAsistentesGenerada.append(asist)
         
-    
     return listaAsistentesGenerada 
 
 #Insertamos los datos de la lista en la BBDD
@@ -99,8 +190,8 @@ def insertarAsistenteBaseDatos(listaAsistentes):
         Apellido, Edad, DNI, PlazaEstadio) values(%s, %s, %s, %s, %s, %s)"""
         cursor.execute(sql, (asistente.idEstadio, asistente.nombre, asistente.apellido, asistente.edad, asistente.DNI, asistente.plazaEstadio))
         db.commit()
+    cursor.execute("SELECT idEstadio FROM tfg.estadio")
+    ids = cursor.fetchall()
+    for id in ids: 
+        modificarPorcentajeLleno(id[0])
     return 
-
-#Por el momento vamos a trabajar solo con un estadio (El metropolitano) con 
-#secciones, grupos, filas y asientos cuadrados, es decir, que todas las secciones
-#son iguales con el mismo numero de grupos filas y asientos
