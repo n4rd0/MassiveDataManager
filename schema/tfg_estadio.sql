@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS `estadio`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `estadio` (
-  `idEstadadio` int NOT NULL,
+  `idEstadio` int NOT NULL,
   `NombreEstadio` varchar(45) NOT NULL,
   `Capacidad` int NOT NULL,
   `Ubicacion` varchar(45) NOT NULL,
