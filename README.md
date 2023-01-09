@@ -6,7 +6,7 @@
 
 Analizar la eficiencia con la que podemos manejar esta informacion es el proposito principal del protyecto. 
 
-#Ejecucion del Programa e Instalacion:
+# Ejecucion del Programa e Instalacion:
 
 - Primero debemos crear la base de datos, los esquemas usados estan proporcionados en la capeta "schema"
 - Posteriormente tenemos que inicializar el archivo "EVI.py" que es la entidad visualizadora de la informacion.
