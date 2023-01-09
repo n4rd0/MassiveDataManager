@@ -1,7 +1,14 @@
 # MassiveDataManager (Final Degree Project by Bernardo Soto Raya at ETSIINF UPM)
 
-- On this project we will be working on a way to handle massive ammounts of data while it is moved between data bases and pyhton modules. 
-- The idea is to symulate the BE of an application that handles the reservation and cancels of tickets from a list of sport stadiums.
-- Eventually the applicattion will allow you to configure your own "stadium". 
+- En este proyecto estaremos manejando grandes cantidadeds de informacion entre bases de datos y modulos de python. 
+- La idea es simular un conjunto de estadios y procesar la reserva y cancelacion de asistentes a los mismos.
+- La aplicacion te permite crear tus propios estadios e introducirlos en el sistema. 
 
-Analyzing the speed and the number of data we can control is the main purpose of this project. For the developing part we will be using some packages such as random, pymysql... (More to be added). 
+Analizar la eficiencia con la que podemos manejar esta informacion es el proposito principal del protyecto. 
+
+#Ejecucion del Programa e Instalacion:
+
+- Primero debemos crear la base de datos, los esquemas usados estan proporcionados en la capeta "schema"
+- Posteriormente tenemos que inicializar el archivo "EVI.py" que es la entidad visualizadora de la informacion.
+
+Nota: Es posible que sea necesario antes de la ejecucion instalar algunos modulos, podemos hacer esto con "pip [nombreDelModulo]". 
