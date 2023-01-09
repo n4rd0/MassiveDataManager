@@ -1,5 +1,5 @@
-asistentesAGenerar=12
-asistentesAEliminar=12
-hilosAUsar=12
+asistentesAGenerar=10
+asistentesAEliminar=0
+hilosAUsar=10
 trabajoConHilos=True
-numeroDeEjecuciones=12
+numeroDeEjecuciones=10

@@ -9,6 +9,7 @@ import time
 from ERI import generarAsistentesERI
 from Generador import eliminarAsistentes
 from Conector import establecerConexion
+import tkinter.messagebox
 
 
 def correrSimulacion(asistentesAGenerar, asistentesAEliminar, hilosAUsar, generarSubida, imprimirPorPantalla, trabajoConHilos, numeroDeEjecuciones):
@@ -28,6 +29,8 @@ def correrSimulacion(asistentesAGenerar, asistentesAEliminar, hilosAUsar, genera
 
         print("\n--- Ejecucion Completada en %.4f s. Asistentes Eliminados: %i. ---" % (time.time() - inicioEliminacion, nEstadios*int(asistentesAEliminar/nEstadios)))
         numeroDeEjecuciones-=1
-        #time.sleep(3)
+        time.sleep(2)
+    tkinter.messagebox.showinfo("Notificacion Simulacion",  "Simulacion Finalizada Con Exito.")
+
 
 #correrSimulacion(100,0,10,True,False,True, 10)

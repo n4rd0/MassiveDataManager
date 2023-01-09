@@ -74,6 +74,7 @@ def obtenerListaDeEstadios():
 
 #Volver a la ventana principal
 def abrirVentanaPrincipal(ventanaActual):
+    asistentesAGenerar, asistentesAEliminar, hilosAUsar, trabajoConHilos,numeroDeEjecuciones = obtenerMetricas()
 
     ventanaActual.destroy()
     pantallaDeInicio = Tk()
@@ -142,6 +143,7 @@ def abrirVentanaPrincipal(ventanaActual):
 #Cambia la ventana a la visualiacion de estadios en tiempo real
 def abrirVisualizacionDeEstadiosEnTiempoReal(ventanaActual):
     #Clase de botones encargados de ejecutare el dibujo del estadio
+    asistentesAGenerar, asistentesAEliminar, hilosAUsar, trabajoConHilos,numeroDeEjecuciones = obtenerMetricas()
     class botonEstadio():
         nombre = ""
         boton = None
@@ -181,23 +183,19 @@ def abrirVisualizacionDeEstadiosEnTiempoReal(ventanaActual):
             db = establecerConexion('localhost', 'root', '7821', 'tfg')
             cursor = db.cursor()
 
-            totalOcupadas = 0
-
             cursor.execute("SELECT idEstadio FROM tfg.estadio WHERE nombreEstadio = %s",nombreEstadio)
             idEstadio = cursor.fetchall()[0][0]
 
             cursor.execute("SELECT PlazaEstadio FROM tfg.asistente WHERE idEstadio = %s",idEstadio)
-            plazasOcupadas = cursor.fetchall()
-
+            plazas = cursor.fetchall()
+            plazasOcupadas = []
+            for p in plazas:
+                plazasOcupadas.append(p[0])
 
             cursor.execute("SELECT Secciones, Grupos, Filas, Asientos FROM tfg.estadio WHERE NombreEstadio = %s",nombreEstadio)
 
             infoAsientosEstadio = cursor.fetchall()
-            totalAsientosPorGrupo = infoAsientosEstadio[0][2]*infoAsientosEstadio[0][3]
 
-            seccion = str(infoAsientosEstadio[0][0])
-            grupo = str(infoAsientosEstadio[0][1])
-            
             textoEstadio.delete(1.0,END)
             textoEstadio.tag_configure("textoCentrado", justify=CENTER,)
 
@@ -210,85 +208,30 @@ def abrirVisualizacionDeEstadiosEnTiempoReal(ventanaActual):
                 textoEstadio.insert(END, "Seccion: "+str(i)+"\n")
                 for j in range(1,infoAsientosEstadio[0][1]+1):
 
-                    seccion = str(i)
-                    grupo = str(j)
-                    if i < 10:
-                        seccion = "0"+str(i)
-                    if j < 10:
-                        grupo = "0"+str(j)
-
-                    for plaza in plazasOcupadas:
-                        if seccion+grupo in plaza[0][:4]:
-                            totalOcupadas+=1
-                    porcentajeLlenado = round(100*totalOcupadas/totalAsientosPorGrupo,1)
-                    totalOcupadas = 0
-                    #print(seccion,grupo, porcentajeLlenado)
-
-                    colorDelFondo = "dark green"
-
-                    if porcentajeLlenado <=5:
-                        colorDelFondo = "forest green"
-
-                    elif porcentajeLlenado > 5 and porcentajeLlenado <= 10:
-                        colorDelFondo = "sea green"
-
-                    elif porcentajeLlenado > 10 and porcentajeLlenado <= 15:
-                        colorDelFondo = "medium sea green"
-
-                    elif porcentajeLlenado > 15 and porcentajeLlenado <= 20:
-                        colorDelFondo = "OliveDrab1"
-
-                    elif porcentajeLlenado > 20 and porcentajeLlenado <= 25:
-                        colorDelFondo = "OliveDrab2"
-
-                    elif porcentajeLlenado > 25 and porcentajeLlenado <= 30:
-                        colorDelFondo = "DarkOliveGreen3"
-
-                    elif porcentajeLlenado > 30 and porcentajeLlenado <= 35:
-                        colorDelFondo = "yellow4"
-
-                    elif porcentajeLlenado > 35 and porcentajeLlenado <= 40:
-                        colorDelFondo = "yellow3"
-
-                    elif porcentajeLlenado > 40 and porcentajeLlenado <= 45:
-                        colorDelFondo = "yellow2"
-
-                    elif porcentajeLlenado > 45 and porcentajeLlenado <= 50:
-                        colorDelFondo = "yellow"
-
-                    elif porcentajeLlenado > 50 and porcentajeLlenado <= 55:
-                        colorDelFondo = "orange2"
-
-                    elif porcentajeLlenado > 55 and porcentajeLlenado <= 60:
-                        colorDelFondo = "orange3"
-
-                    elif porcentajeLlenado > 60 and porcentajeLlenado <= 65:
-                        colorDelFondo = "sienna2"
-
-                    elif porcentajeLlenado > 65 and porcentajeLlenado <= 70:
-                        colorDelFondo = "chocolate1"
-
-                    elif porcentajeLlenado > 70 and porcentajeLlenado <= 75:
-                        colorDelFondo = "chocolate2"
-
-                    elif porcentajeLlenado > 75 and porcentajeLlenado <= 80:
-                        colorDelFondo = "OrangeRed2"
-
-                    elif porcentajeLlenado > 80 and porcentajeLlenado <= 85:
-                        colorDelFondo = "OrangeRed3"
-
-                    elif porcentajeLlenado > 85 and porcentajeLlenado <= 90:
-                        colorDelFondo = "red2"
-
-                    elif porcentajeLlenado > 90 and porcentajeLlenado <= 95:
-                        colorDelFondo = "red3"
-
-                    elif porcentajeLlenado > 95 and porcentajeLlenado <= 100:
-                        colorDelFondo = "red4"
-
-                    textTemp = Text(bg = colorDelFondo, width= 6,height=3, font="InputMonoCondensed 6")
-                    textTemp.insert(END,"g:"+str(j)+"\np:"+str(porcentajeLlenado)+"%")
+                    textTemp = Text(width= 9,height=4, font="InputMonoCondensed 6")
                     textoEstadio.window_create(END,window=textTemp)
+
+                    for k in range(1,infoAsientosEstadio[0][2]+1):
+                        for l in range(1,infoAsientosEstadio[0][3]+1):
+
+                            seccion = "0"+str(i)
+                            seccion = seccion[-2:]
+
+                            grupo = "0"+str(j)
+                            grupo = grupo[-2:]
+
+                            fila = "0"+str(k)
+                            fila = fila[-2:]
+
+                            asiento = "0"+str(l)
+                            asiento = asiento[-2:]
+
+                            colorDelFondo = "green"
+                            if seccion+grupo+fila+asiento in plazasOcupadas:
+                                colorDelFondo = "red"
+
+                            textTemp2 = Text(bg = colorDelFondo, width= 1,height=1, font="InputMonoCondensed 6")
+                            textTemp.window_create(END,window=textTemp2)
 
                 textoEstadio.insert(END,"\n")
                 textoEstadio.insert(END,"\n")
@@ -300,7 +243,7 @@ def abrirVisualizacionDeEstadiosEnTiempoReal(ventanaActual):
         botonIniciarSimulacion["state"] = DISABLED
         t1.start()
         botonIniciarSimulacion["state"] = NORMAL
-    
+
     frameCajaScrollConEstadios = LabelFrame(visualizacionDeEstadiosEnTiempoReal)
     texto = Text(frameCajaScrollConEstadios, width=28, height=35)
     cajaScrolleableConEstadios = Scrollbar(frameCajaScrollConEstadios, command=texto.yview)
@@ -335,6 +278,7 @@ def abrirVisualizacionDeEstadiosEnTiempoReal(ventanaActual):
 #Cambia la ventana a la visualiacion de metricas de estadios en tiempo real
 def abrirVisualizacionMetricasDeEstadiosEnTiempoReal(ventanaActual):
     #Clase de botones encargados de ejecutare el dibujo del estadio
+    asistentesAGenerar, asistentesAEliminar, hilosAUsar, trabajoConHilos,numeroDeEjecuciones = obtenerMetricas()
     class botonEstadio():
         nombre = ""
         boton = None
@@ -431,6 +375,7 @@ def abrirVisualizacionMetricasDeEstadiosEnTiempoReal(ventanaActual):
 
 #Lista de los estadios registrados en el sistema
 def consultarEstadios(ventanaActual):
+    asistentesAGenerar, asistentesAEliminar, hilosAUsar, trabajoConHilos,numeroDeEjecuciones = obtenerMetricas()
 
     estadioSeleccionado = ""
 
@@ -515,6 +460,7 @@ def consultarEstadios(ventanaActual):
 
 #Lista de los asistentes con su respectivo estadio en el sistema
 def consultarAsistentes(ventanaActual):
+    asistentesAGenerar, asistentesAEliminar, hilosAUsar, trabajoConHilos,numeroDeEjecuciones = obtenerMetricas()
 
     def updateListBox(lista, limit):
         textoAsistente.delete(0,END)
@@ -589,6 +535,7 @@ def consultarAsistentes(ventanaActual):
     
 #Crear estadios
 def crearEstadio(ventanaActual): 
+    asistentesAGenerar, asistentesAEliminar, hilosAUsar, trabajoConHilos,numeroDeEjecuciones = obtenerMetricas()
 
     def generarEstadioAux():
         
