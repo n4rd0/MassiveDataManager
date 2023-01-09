@@ -1,5 +1,0 @@
-Aplicacion Modular (crear estadios al gusto)
-EAI : Entidad Actualizadora Informacion
-EVI
-Seguridad (TLS)
-Metricas de rendimiento
