@@ -31,8 +31,8 @@ CREATE TABLE `estadio` (
   `Grupos` int DEFAULT NULL,
   `Filas` int DEFAULT NULL,
   `Asientos` int DEFAULT NULL,
-  `PorcentajeLLeno` int GENERATED ALWAYS AS (0) VIRTUAL,
-  PRIMARY KEY (`idEstadadio`)
+  `PorcentajeLLeno` double DEFAULT '0',
+  PRIMARY KEY (`idEstadio`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -42,7 +42,7 @@ CREATE TABLE `estadio` (
 
 LOCK TABLES `estadio` WRITE;
 /*!40000 ALTER TABLE `estadio` DISABLE KEYS */;
-INSERT INTO `estadio` (`idEstadadio`, `NombreEstadio`, `Capacidad`, `Ubicacion`, `Secciones`, `Grupos`, `Filas`, `Asientos`) VALUES (0,'Civitas Metropolitano',68456,'madrid',5,39,20,18),(1,'Santiago Bernabeu',81044,'madrid',7,46,20,18);
+INSERT INTO `estadio` VALUES (0,'Teatro Real',1400,'Madrid',7,10,20,1,18.5),(1,'Cines Callao',1200,'Madrid',5,12,20,1,20.3333),(2,'Gran Teatre del Liceu',2100,'Barcenlona',7,12,25,1,12.619),(3,'Teatro de Rojas',720,'Toledo',4,10,18,1,34.1667),(4,'Teatro Arriaga Antzokia',1200,'Madrid',10,12,10,1,21.6667),(5,'Teatro Lope de Vega',1875,'Sevilla',5,15,25,1,13.1733),(6,'Gran Teatro Falla',1200,'Cadiz',6,10,20,1,19.75),(7,'Teatro Calderon',720,'Valladolid',4,10,18,1,33.6111);
 /*!40000 ALTER TABLE `estadio` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -55,4 +55,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-11-04  9:32:52
+-- Dump completed on 2023-01-09 15:10:16

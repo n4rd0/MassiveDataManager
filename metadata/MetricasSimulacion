@@ -1,0 +1,5 @@
+asistentesAGenerar=12
+asistentesAEliminar=12
+hilosAUsar=12
+trabajoConHilos=True
+numeroDeEjecuciones=12

@@ -11,21 +11,23 @@ from Generador import eliminarAsistentes
 from Conector import establecerConexion
 
 
-db = establecerConexion('localhost', 'root', '7821', 'tfg')
-cursor = db.cursor()
+def correrSimulacion(asistentesAGenerar, asistentesAEliminar, hilosAUsar, generarSubida, imprimirPorPantalla, trabajoConHilos, numeroDeEjecuciones):
+    while numeroDeEjecuciones > 0:
+        db = establecerConexion('localhost', 'root', '7821', 'tfg')
+        cursor = db.cursor()
 
-asistentesAEliminar = 10000
-asistentesAGenerar = 0
-hilosAUsar = 0
+        generarAsistentesERI(asistentesAGenerar, hilosAUsar,generarSubida, imprimirPorPantalla, trabajoConHilos)
 
-generarAsistentesERI(asistentesAGenerar, hilosAUsar,True, False, True)
+        inicioEliminacion = time.time()
 
-inicioEliminacion = time.time()
+        nEstadios = cursor.execute("SELECT NombreEstadio from tfg.estadio")
+        estadios = cursor.fetchall()
 
-nEstadios = cursor.execute("SELECT NombreEstadio from tfg.estadio")
-estadios = cursor.fetchall()
+        for estadio in estadios:
+            eliminarAsistentes(estadio[0], int(asistentesAEliminar/nEstadios))
 
-for estadio in estadios:
-    eliminarAsistentes(estadio[0], int(asistentesAEliminar/nEstadios))
+        print("\n--- Ejecucion Completada en %.4f s. Asistentes Eliminados: %i. ---" % (time.time() - inicioEliminacion, nEstadios*int(asistentesAEliminar/nEstadios)))
+        numeroDeEjecuciones-=1
+        #time.sleep(3)
 
-print("\n--- Ejecucion Completada en %.4f s. Asistentes Eliminados: %i. ---" % (time.time() - inicioEliminacion, nEstadios*int(asistentesAEliminar/nEstadios)))
+#correrSimulacion(100,0,10,True,False,True, 10)

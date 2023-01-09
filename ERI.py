@@ -5,9 +5,10 @@ import time
 import threading
 from GeneradorHilos import * 
 
-inicioPrograma = time.time()
 
 def generarAsistentesERI(numeroDeAsistentes, numeroDeHilos, generarSubida, imprimirPorPantalla, trabajoConHilos):
+    inicioPrograma = time.time()
+
     if trabajoConHilos:
         t = []
         
