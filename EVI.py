@@ -432,6 +432,8 @@ def abrirVisualizacionMetricasDeEstadiosEnTiempoReal(ventanaActual):
 #Lista de los estadios registrados en el sistema
 def consultarEstadios(ventanaActual):
 
+    estadioSeleccionado = ""
+
     def updateListBox(lista):
         textoEstadio.delete(0,END)
 
@@ -451,6 +453,8 @@ def consultarEstadios(ventanaActual):
         
         updateListBox(data)
 
+
+
     ventanaActual.destroy()
 
     visualizacionConsultarEstadios = Tk()
@@ -468,6 +472,15 @@ def consultarEstadios(ventanaActual):
     frameCajaEstadio = LabelFrame(visualizacionConsultarEstadios)
     barraDeBusqueda = Entry(frameCajaEstadio, font="InputMonoCondensed 12", width=60)
     textoEstadio = Listbox(frameCajaEstadio, width=90, height=30)
+    eliminarEstadioBoton = Button(frameCajaEstadio, width=20, height=1,text="Eliminar Estadio", 
+        font="InputMonoCondensed 12", command= lambda: eliminarEstadioSeleccionado())
+    
+    def fillout(e):
+            estadioSeleccionado = textoEstadio.get(textoEstadio.curselection())
+            return estadioSeleccionado
+
+    barraDeBusqueda.bind("<KeyRelease>", check)
+    textoEstadio.bind("<<ListboxSelect>>", fillout)
 
     listaEstadios = obtenerListaDeEstadios()
     nombresEstadios = []
@@ -476,7 +489,17 @@ def consultarEstadios(ventanaActual):
     
     updateListBox(nombresEstadios)
 
-    barraDeBusqueda.bind("<KeyRelease>", check)
+    def eliminarEstadioSeleccionado():
+
+        estadioSeleccionado = fillout("<<ListboxSelect>>")
+        db = establecerConexion('localhost', 'root', '7821', 'tfg')
+        cursor = db.cursor()
+
+        print(estadioSeleccionado)
+        cursor.execute("DELETE FROM tfg.estadio WHERE NombreEstadio = %s", estadioSeleccionado)
+        db.commit()
+        nombresEstadios.remove(estadioSeleccionado)
+        updateListBox(nombresEstadios)
 
     #Grid - Pantalla Visualizacion de Estadios en Tiempo Real
 
@@ -486,6 +509,7 @@ def consultarEstadios(ventanaActual):
     frameCajaEstadio.grid(row = 1, column=0, pady=10,padx=240, sticky="w")
     barraDeBusqueda.grid(row=0,column=0, pady=10)
     textoEstadio.grid(row=1, column=0, pady=10)
+    eliminarEstadioBoton.grid(row=2, column=0, pady=10)
 
     visualizacionConsultarEstadios.mainloop()
 
@@ -580,7 +604,7 @@ def crearEstadio(ventanaActual):
         Filas = int(Filas)
         Asientos = int(Asientos)
         
-        if isinstance(Secciones, int) and Secciones > 0 and isinstance(Grupos, int) and Grupos > 0 and isinstance(Filas, int) and Filas > 0 and isinstance(Asientos, int) and Asientos > 0 and NombreEstadio.strip() != "" and Ubicacion.stri() != "":
+        if isinstance(Secciones, int) and Secciones > 0 and isinstance(Grupos, int) and Grupos > 0 and isinstance(Filas, int) and Filas > 0 and isinstance(Asientos, int) and Asientos > 0 and NombreEstadio.strip() != "" and Ubicacion.strip() != "":
             tkinter.messagebox.showinfo("Notificacion Crear Estadio",  "El Estadio se ha creado Correctamente")
             generarEstadio(NombreEstadio, Ubicacion, Secciones, Grupos,Filas, Asientos)
         
